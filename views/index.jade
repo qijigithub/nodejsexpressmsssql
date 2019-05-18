@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  h1= title
+  p Please input the year and week number
+  //- form(method='POST' action='/select/week')
+  form(method='POST' action='/select/week')
+    tr
+      th Year
+      td
+        input(type="number" placeholder="YYYY" min="2009" max="2019" name="year").text
+    tr
+      th Week Number
+      td
+        input(type="number" placeholder="XX" min="1" max="53" name="week").text
+        button(type="submit").btn Submit
+          //- a(href="/#{item.id}", title="Edit").icon
+          //- i(aria-hidden="true").fa.fa-pencil-square
+          //- input(type="date" name="fromdate").text
+          //-  input(type="date" name="todate").text

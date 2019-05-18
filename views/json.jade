@@ -1,0 +1,133 @@
+extends layout
+
+block content
+   -var first = data[0]
+   -var buget = []
+   h1= title2  
+   form(method='POST' action='/select/week')
+    tr
+      th Year
+      td
+        input(type="number" placeholder="YYYY" min="2009" max="2019" name="year").text
+    tr
+      th Week Number
+      td
+        input(type="number" placeholder="XX" min="1" max="53" name="week").text
+        button(type="submit").btn Submit
+   form(method='POST' action='/add')
+    tr
+     th submit budget
+     td
+      a(href="/add", title="title").btn Add      
+   label Total： #{data.length}
+   br
+   label Year  #{year}    Week  #{week} 
+
+   if first
+   div  
+     table.list(border-collapse: collapse,border='1')
+      thead
+       tr
+        th Category
+        th item#
+        th googlecateads cost
+        th Autal Spend new
+        th Actual Spend
+        th Unit Price and WeeklyQTY
+        th CategoryQty
+        th revenue and Unit_Profit
+        th Profit
+        th Unit Margin
+        th Total Margin
+        //- th ROI 
+      tbody
+        each item in data
+         tr
+            td= item.CATEGORY
+            td
+              table.list.inner-tableitem.bigtable(border-collapse: collapse,border='1')
+               thead
+                th item
+                th ads             
+               tbody
+                each item2 in data2
+                 if (item.CATEGORY == item2.CATEGORY) 
+                  tr
+                   td= item2.ITEM_SKU
+                   td
+                    table.list.inner-tableads.bigtable(border-collapse: collapse,border='1')
+                      thead
+                        th label
+                        th avgCPC
+                        th cost
+                        th label
+                        th avgCPC
+                        th cost
+                      tbody 
+                        each click in googleadsitem
+                          if (item2.ITEM_SKU == click.item)
+                            td= click.label
+                            td= click.avgcpc
+                            td= click.cost
+                        tr
+                         each sellerad in aselleradsitem 
+                          if (item2.ITEM_SKU == sellerad.item)
+                            td= sellerad.label
+                            td= sellerad.avgcpc
+                            td= sellerad.cost
+            each gcateads in googleadscate
+              if(item.CATEGORY == gcateads.item) 
+                td= gcateads.cost
+            each ad in adssum
+              if(item.CATEGORY == ad.category)
+                td= ad.cost
+            //- each b,i in tbudget
+            //-   if (item.CATEGORY == b.category) 
+            //-    td= b.budget
+                //- input(type='number', name='budget['+#{i}+']['budget']').text
+                //-  form(method='POST' action='/select/week')
+                //-   input(type='number', name='budget').text
+                //-   button(type="submit").btn OK
+            //-     td
+            //-       #{budget}
+            //-       //- input(type='number', name='budget[#{i}]')
+            //-       input(type='number', name='budget').text
+            //-       button(type="submit").btn OK
+            //-       button(type="delete").btn Delete
+            //- - for (var i = 0; i < tbudget.length; i++)
+            //-   - var b = tbudget[i]
+            //-   input(type='text', name='tbudget[#{i}]['budget']', value='#{b}',style="witdh:2px")
+            td= '$ '+ item.AmazonSpend
+            td
+              table.list.inner-tableother.bigtable(border-collapse: collapse,border='1') 
+               thead
+                th Unit_Price
+                th WeeklyQTY
+               tbody
+                each item2 in data2
+                 if (item.CATEGORY == item2.CATEGORY) 
+                  tr
+                   td= '$ '+ item2.UNIT_PRICE
+                   td= item2.WEEKLYQTY
+            td= item.categoryqty
+            td
+              table.list.inner-tableother.bigtable(border-collapse: collapse,border='1') 
+               thead
+                th Revenue
+                th Unit_Profit
+               tbody
+                each item2 in data2
+                 if (item.CATEGORY == item2.CATEGORY)
+                  tr
+                   td= '$ '+item2.REVENUE
+                   td= '$ '+item2.unit_profit
+                  //-  each uprofit in unitprofit
+                  //-     if (item2.ITEM_SKU == uprofit.item_sku)
+                  //-       td= uprofit.unit_profit
+            each item3 in profit
+             if (item.CATEGORY == item3.CATEGORY) 
+               td= '$ '+item3.PROFIT
+            each item5 in margin
+             if (item.CATEGORY == item5.CATEGORY)
+              td= '$ '+item5.Unit_Margin
+              td= '$ '+item5.Margin
