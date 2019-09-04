@@ -12,10 +12,10 @@ router.get('/', function(req, res, next) {
 
 const sql = require('mssql');
 const config = {
-  user: 'bvdeveloper',
-  password: 'Bv@1680',
-  server: '192.168.8.8',
-  database: 'BV_International',
+  user: ,
+  password: ,
+  server: ,
+  database: ,
   connectionTimeout: 1000000,
   requestTimeout: 1000000
 };
