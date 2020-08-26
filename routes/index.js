@@ -33,47 +33,9 @@ module.exports = {
 //srt1.js
 router.post('/select/week', async (req, res) => {
   var subquery1 =
-    " select CategoryName, isnull(AmazonSpend,0) as 'AmazonSpend',d.CATEGORY,categoryqty" +
-    " from (select CategoryName, isnull(sum(AdSpend),0) as 'AmazonSpend' from [BV_International].[dbo].[SKUCategory]" +
-    " left join [BV_International].[dbo].[CampignPerformanceConcrete]" +
-    "  on ItemSKU = [Advertised SKU] and region = 'Amazon.com'" +
-    " where AdDate between @fromdate and @todate" +
-    " group by CategoryName) a" +
-    " RIGHT join(" +
-    " select Category, sum(categoryqty) as 'categoryqty' from (" +
-    " select category, sum(qtyorder) as 'categoryqty'" +
-    " from [BV_International].[dbo].[Pending_OrderView_ALL] where week= @year*100+@week and SalesChannel = 'amazon.com' group by category" +
-    " union all" +
-    " select CATEGORY, isnull(sum(QtyOrder),0) as 'categoryqty'" +
-    " from [BV_International].[dbo].[VEN_FBA_Combined_Daily]" +
-    " where week = @year*100+@week and SalesChannel = 'VEN US SELL' group by CATEGORY) x" +
-    " group by Category) d" +
-    " on a.CategoryName=d.CATEGORY" +
-    " order by Category"
+
 
   var subquery2 =
-    "select qty.*, isnull(TotalCost,0) as TotalCost, isnull(FBAFee,0) as FBAFee, VendorProfit, Vendorprice, isnull(ads,0) as ads, isnull([ShipToFBA],0) as 'ShipToFBA'  from" +
-    " (select CATEGORY,[ITEM_SKU],SUM(WEEKLYQTY) as WEEKLYQTY, round(UNIT_PRICE,2) as UNIT_PRICE,round(REVENUE,2) as REVENUE,round(unit_profit,2) as unit_profit from" +
-    " (SELECT CATEGORY,[ITEM_SKU],SUM(QtyOrder) AS 'WEEKLYQTY',SUM([TotalPrice])/ NULLIF(SUM(QtyOrder),0) AS 'UNIT_PRICE',SUM([TotalPrice]) AS 'REVENUE', SUM([TotalPrice])/ NULLIF(SUM(QtyOrder),0) as unit_profit" +
-    " FROM [BV_International].[dbo].[Pending_OrderView_ALL]" +
-    " WHERE WEEK =@year*100+@week and SalesChannel = 'amazon.com' GROUP BY [ITEM_SKU],[category]" +
-    " union all" +
-    " select Category, vendor.ITEM_SKU ,WEEKLYQTY,Vendorprice AS 'UNIT_PRICE',WEEKLYQTY AS 'REVENUE',VendorProfit as unit_profit from" +
-    " (select Category, ITEM_SKU ,isnull(sum(QtyOrder),0) as 'WEEKLYQTY'" +
-    " from  [BV_International].[dbo].[VEN_FBA_Combined_Daily]" +
-    " where week = @year*100+@week  and SalesChannel = 'VEN US SELl' group by Category, item_sku) vendor" +
-    " left join  [BV_International].[dbo].[ItemFBAProfits] profit" +
-    //" on   profit.item_sku like vendor.item_SKU+'%') allitem"+
-    " on   profit.item_sku = vendor.item_SKU) allitem" +
-    " group by CATEGORY,[ITEM_SKU], UNIT_PRICE,REVENUE,unit_profit) qty" +
-    " left join(select * from [BV_International].[dbo].[ItemFBAProfits]) cost" +
-    " on qty.ITEM_SKU = cost.item_SKU" +
-    " left join ( select ItemSKU,round(sum(AdSpend),2) as 'ads' from [BV_International].[dbo].[SKUCategory]" +
-    "	right join [BV_International].[dbo].[CampignPerformanceConcrete]" +
-    "	on ItemSKU = [Advertised SKU] and region = 'Amazon.com'" +
-    //" where AdDate between '2019-03-11' and '2019-03-17' group by ItemSKU) ad"+
-    " where AdDate between @fromdate and @todate group by ItemSKU) ad" +
-    "	on qty.ITEM_SKU = ad.ItemSKu"
 
 
   // about actual spend: CategoryName,CategoryName
@@ -86,28 +48,16 @@ router.post('/select/week', async (req, res) => {
 
   //google ads
   var subquery3 =
-    "SELECT * FROM [GoogleAdWords].[dbo].[CRITERIA_PERFORMANCE_REPORT]" +
-    " where 1=1 and AccountName = 'BVINTERNATIONALUS' and date between @fromdate and @todate and  SalesChannel = 'amazon.com'"
+
 
 
   //about ads, vendor vendor central first: Date,CategoryName,[Campaign Name],CPC, spend
-  var subquery4 = "select Date,CategoryName,[Campaign Name],substring([Cost Per Click (CPC)],2,len([Cost Per Click (CPC)])-1) as CPC,SUBSTRING(Spend,2,len(Spend)-1) as Spend" +
-    " from [BV_International].[dbo].VendorSponsoredProductAdvertisedPr" +
-    " join(select distinct asin,CategoryName from [BV_International].[dbo].[vw_Amazon_SKU_ASIN_UPC_Mapping]" +
-    " join [BV_International].[dbo].[SKUCategory]" +
-    " on itemSKU= AmazonSKU ) c" +
-    " on asin =[Advertised ASIN]" +
-    " where date between @fromdate and @todate and  SalesChannel = 'amazon.com'"
+  var subquery4 = 
+
 
   //about ads, vender express: Date,categoryname ,a.[Campaign Name], CPC, Spend
-  var subquery5 = "select a.Date,categoryname ,a.[Campaign Name],substring([Cost Per Click (CPC)],2,len([Cost Per Click (CPC)])-1) as CPC,SUBSTRING(Spend,2,len(Spend)-1) as Spend" +
-    " from [BV_International].[dbo].VendorSponsoredBrandsCampaignReport a" +
-    " left join (select CategoryName  from [BV_International].[dbo].[SKUCategory]" +
-    " join [BV_International].[dbo].[CampignPerformanceConcrete]" +
-    " on ItemSKU = [Advertised SKU]" +
-    " group by CategoryName) c" +
-    " on  c.CategoryName like SUBSTRING([Portfolio name],3,len([Portfolio name])-6)+'%'" +
-    " where date between @fromdate and @todate and SalesChannel = 'amazon.com'"
+  var subquery5 = 
+
 
   try {
     firstDay = new Date(req.body.year, 0, 1).getDay();
